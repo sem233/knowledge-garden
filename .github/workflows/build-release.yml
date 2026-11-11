@@ -113,8 +113,7 @@ jobs:
         run: |
           npm install --legacy-peer-deps
           npm run build
-          npm install --no-save --legacy-peer-deps electron@33 electron-builder@25
-          npx electron-builder --win nsis portable --x64
+          npx --yes electron-builder@25.1.8 --win portable nsis --x64 --config.win.signAndEditExecutable=false
 
       - name: Upload Windows .EXE Artifacts
         uses: actions/upload-artifact@v4
