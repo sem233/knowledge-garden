@@ -104,18 +104,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Build Standalone Bundle & Compile Native Windows KnowledgeGarden-PC.exe
-        shell: cmd
+      - name: Compile Native Windows KnowledgeGarden-PC.exe
+        shell: pwsh
         run: |
-          npm install --legacy-peer-deps
-          npm run build
-          node scripts/package-all.mjs
-          C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /out:KnowledgeGarden-PC.exe /resource:public\KnowledgeGarden-Standalone.html,app.html electron\Launcher.cs
+          & "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:winexe /out:KnowledgeGarden-PC.exe /resource:public\KnowledgeGarden-Standalone.html,app.html electron\Launcher.cs
+          if (-not (Test-Path "KnowledgeGarden-PC.exe")) { throw "Failed to compile KnowledgeGarden-PC.exe" }
 
       - name: Upload Windows .EXE Artifact
         uses: actions/upload-artifact@v4
@@ -128,4 +121,5 @@ jobs:
         with:
           tag_name: v1.0.0
           files: KnowledgeGarden-PC.exe
+
 
