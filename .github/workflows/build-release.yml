@@ -109,20 +109,23 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies & Build Windows .EXE (Setup + Portable)
+      - name: Build Standalone Bundle & Compile Native Windows KnowledgeGarden-PC.exe
+        shell: cmd
         run: |
           npm install --legacy-peer-deps
           npm run build
-          npx --yes electron-builder@25.1.8 --win portable nsis --x64 --config.win.signAndEditExecutable=false
+          node scripts/package-all.mjs
+          C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /out:KnowledgeGarden-PC.exe /resource:public\KnowledgeGarden-Standalone.html,app.html electron\Launcher.cs
 
-      - name: Upload Windows .EXE Artifacts
+      - name: Upload Windows .EXE Artifact
         uses: actions/upload-artifact@v4
         with:
           name: KnowledgeGarden-Windows-EXE
-          path: release/*.exe
+          path: KnowledgeGarden-PC.exe
 
       - name: Attach Windows .EXE to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
-          files: release/*.exe
+          files: KnowledgeGarden-PC.exe
+
