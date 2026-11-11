@@ -1,0 +1,9 @@
+{
+  "appId": "com.knowledgegarden.app",
+  "appName": "بستان المعرفة",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

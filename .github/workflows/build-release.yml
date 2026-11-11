@@ -1,0 +1,63 @@
+name: Build Windows EXE, Android Web & Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-pages-and-standalone:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies & Build Web/Android PWA
+        run: |
+          npm install
+          npm run build
+          node scripts/package-all.mjs
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy to GitHub Pages (Works on PC Chrome & Android with zero 403)
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  build-windows-exe:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies & Build Windows .EXE (Setup + Portable)
+        run: |
+          npm install
+          npm install -D electron electron-builder
+          npm run desktop:exe
+
+      - name: Upload Windows .EXE Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: KnowledgeGarden-Windows-EXE
+          path: |
+            release/*.exe
+            public/KnowledgeGarden-Standalone.html

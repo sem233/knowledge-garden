@@ -1,0 +1,6 @@
+{
+  "name": "بستان المعرفة — Knowledge Garden",
+  "description": "دفتر يومي شخصي للتعلم والنمو المعرفي يتحول فيه كل ما تتعلمه إلى دماغ عصبي حي وشجرة معرفة تنمو أمام عينيك.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

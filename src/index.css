@@ -1,0 +1,194 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-cairo: 'Cairo', system-ui, -apple-system, sans-serif;
+    --font-amiri: 'Amiri', Georgia, serif;
+    --font-kufi: 'Reem Kufi', 'Cairo', sans-serif;
+  }
+
+  html {
+    font-family: var(--font-cairo);
+    direction: rtl;
+  }
+
+  body {
+    font-family: var(--font-cairo);
+    overflow-x: hidden;
+  }
+}
+
+.font-cairo {
+  font-family: var(--font-cairo);
+}
+
+.font-amiri {
+  font-family: var(--font-amiri);
+}
+
+.font-kufi {
+  font-family: var(--font-kufi);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.45);
+}
+
+/* TipTap Rich Text Styles */
+.ProseMirror {
+  outline: none;
+  min-height: 260px;
+  line-height: 1.85;
+  direction: rtl;
+  text-align: right;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: right;
+  color: rgba(148, 163, 184, 0.45);
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.85em;
+}
+
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3 {
+  font-family: var(--font-kufi);
+  font-weight: 700;
+  margin-top: 1.1em;
+  margin-bottom: 0.45em;
+}
+
+.ProseMirror blockquote {
+  font-family: var(--font-amiri);
+  font-size: 1.2em;
+  border-right: 3px solid rgba(139, 92, 246, 0.6);
+  padding-right: 1rem;
+  margin: 1rem 0;
+  opacity: 0.92;
+}
+
+.ProseMirror mark,
+.reading-content mark {
+  border-radius: 0.35rem;
+  padding: 0.12rem 0.4rem;
+  margin: 0 0.08rem;
+  color: #090d16 !important;
+  font-weight: 600;
+  background-color: #fde047;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.ProseMirror mark[data-color="#fde047"],
+.reading-content mark[data-color="#fde047"] {
+  background-color: #fde047 !important;
+}
+
+.ProseMirror mark[data-color="#86efac"],
+.reading-content mark[data-color="#86efac"] {
+  background-color: #86efac !important;
+}
+
+.ProseMirror mark[data-color="#f9a8d4"],
+.reading-content mark[data-color="#f9a8d4"] {
+  background-color: #f9a8d4 !important;
+}
+
+.ProseMirror mark[data-color="#93c5fd"],
+.reading-content mark[data-color="#93c5fd"] {
+  background-color: #93c5fd !important;
+}
+
+.ProseMirror mark[data-color="#fdba74"],
+.reading-content mark[data-color="#fdba74"] {
+  background-color: #fdba74 !important;
+}
+
+.ProseMirror mark[data-color="#d8b4fe"],
+.reading-content mark[data-color="#d8b4fe"] {
+  background-color: #d8b4fe !important;
+}
+
+.ProseMirror a,
+.reading-content a {
+  color: #38bdf8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reading-content p {
+  margin-bottom: 1.05em;
+}
+
+.reading-content blockquote {
+  font-family: var(--font-amiri);
+  font-size: 1.25em;
+  border-right: 3px solid rgba(139, 92, 246, 0.6);
+  padding-right: 1rem;
+  margin: 1.25rem 0;
+  opacity: 0.95;
+}
+
+/* Card clip paths and special templates */
+.clip-notched {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+.clip-folded {
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
+}
+
+/* Film grain overlay */
+.bg-film-grain {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Perspective for 3D Flip Flashcards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
