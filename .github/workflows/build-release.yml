@@ -1,4 +1,4 @@
-name: Build Windows EXE, Android Web & Deploy to GitHub Pages
+name: Build Windows EXE, Android APK & Deploy to GitHub
 
 on:
   push:
@@ -17,25 +17,86 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies & Build Web/Android PWA
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
           node scripts/package-all.mjs
+
+      - name: Publish Standalone Chrome HTML & Project ZIP to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "بستان المعرفة — تحميل مباشر (Windows .EXE + Android .APK + Chrome .HTML)"
+          body: |
+            ## 🌿 تحميل تطبيق بستان المعرفة (Knowledge Garden) لجميع الأجهزة
+            - **للكمبيوتر (Windows .EXE)**: حمّل ملف `KnowledgeGarden-Setup.exe` أو النسخة المحمولة `KnowledgeGarden-Portable.exe` بالأسفل.
+            - **لهاتف الأندرويد (Android .APK)**: حمّل ملف `KnowledgeGarden-Android.apk` وثبّته مباشرة على هاتفك.
+            - **كصفحة Google Chrome مستقلة بدون إنترنت (.HTML)**: حمّل ملف `KnowledgeGarden-Standalone.html` وافتحه مباشرة في كروم على الكمبيوتر أو الهاتف.
+          files: |
+            public/KnowledgeGarden-Standalone.html
+            public/KnowledgeGarden-Full-Project.zip
+          prerelease: false
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        continue-on-error: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
-      - name: Deploy to GitHub Pages (Works on PC Chrome & Android with zero 403)
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+  build-android-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java 21 for Android Gradle
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build Web Bundle & Generate Android APK via Capacitor
+        run: |
+          npm install --legacy-peer-deps
+          npm run build
+          npm install --no-save --legacy-peer-deps @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npx cap add android
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../KnowledgeGarden-Android.apk
+
+      - name: Upload Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KnowledgeGarden-Android-APK
+          path: KnowledgeGarden-Android.apk
+
+      - name: Attach Android APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          files: KnowledgeGarden-Android.apk
 
   build-windows-exe:
     runs-on: windows-latest
@@ -43,21 +104,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies & Build Windows .EXE (Setup + Portable)
         run: |
-          npm install
-          npm install -D electron electron-builder
-          npm run desktop:exe
+          npm install --legacy-peer-deps
+          npm run build
+          npm install --no-save --legacy-peer-deps electron@33 electron-builder@25
+          npx electron-builder --win nsis portable --x64
 
       - name: Upload Windows .EXE Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: KnowledgeGarden-Windows-EXE
-          path: |
-            release/*.exe
-            public/KnowledgeGarden-Standalone.html
+          path: release/*.exe
+
+      - name: Attach Windows .EXE to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          files: release/*.exe
