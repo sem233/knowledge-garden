@@ -5,8 +5,8 @@ import { NodePosition } from '../types';
  * two-hemisphere procedural Brain silhouette.
  */
 export function isPointInsideBrain(nx: number, ny: number): boolean {
-  // Left hemisphere centered at (-0.36, 0), radii (0.48, 0.72)
-  // Right hemisphere centered at (+0.36, 0), radii (0.48, 0.72)
+  // Left hemisphere centered at (-0.34, 0), radii (0.52, 0.76)
+  // Right hemisphere centered at (+0.34, 0), radii (0.52, 0.76)
   const leftDist = Math.pow((nx + 0.34) / 0.52, 2) + Math.pow(ny / 0.76, 2);
   const rightDist = Math.pow((nx - 0.34) / 0.52, 2) + Math.pow(ny / 0.76, 2);
 
@@ -66,7 +66,7 @@ export function computeGroupHub(
   const clamped = clampToBrainSilhouette(rawNx, rawNy);
 
   // Tree branch geometry: trunk base at (0, 360), trunk top at (0, 40)
-  // Branches fan out from -140 deg to -40 deg (upward fan)
+  // Branches fan out from -145 deg to -35 deg (upward fan)
   const fanRatio = safeTotal === 1 ? 0.5 : groupIndex / (safeTotal - 1);
   const branchAngle = (-145 + fanRatio * 110) * (Math.PI / 180);
   const branchLen = 190 + (groupIndex % 3) * 45;
@@ -83,7 +83,10 @@ export function computeGroupHub(
 }
 
 /**
- * Computes initial or incremental node position for an entry around its group hub
+ * Computes initial or incremental node position for an entry around its group hub.
+ * Uses an organic multi-lobe Phyllotaxis + Halton volume distribution so that whether
+ * there are 25 entries or 20,000 entries, nodes fill the entire cerebral hemisphere
+ * and tree canopy volume naturally without ever piling up on a hard circle rim.
  */
 export function computeNodePositionForEntry(
   entryId: string,
@@ -95,19 +98,42 @@ export function computeNodePositionForEntry(
 ): NodePosition {
   const hub = computeGroupHub(groupIndex, totalGroups, 520);
   const goldenAngle = 2.399963229728653; // radians
-  const theta = entryIndexInGroup * goldenAngle + (seed % 100) * 0.01;
-  // Spiral outward gently with sqrt(index) so density stays balanced and clears hub label
-  const radius = Math.min(195, 34 + Math.sqrt(entryIndexInGroup + 1) * 11.5);
+  const theta = entryIndexInGroup * goldenAngle + (seed % 100) * 0.017;
 
-  const rawBrainX = hub.brainHubX + Math.cos(theta) * radius;
-  const rawBrainY = hub.brainHubY + Math.sin(theta) * radius;
+  // Organic multi-lobed modulation so clusters look like natural brain lobes / tree foliage clouds
+  const organicLobe =
+    1 +
+    0.18 * Math.sin(theta * 3 + groupIndex * 1.3) +
+    0.12 * Math.cos(theta * 5 - groupIndex * 0.7);
+
+  let normalizedRadial: number;
+  if (entryIndexInGroup < 90) {
+    // Smooth outward spiral for the first 90 entries
+    normalizedRadial = 0.14 + 0.86 * Math.sqrt((entryIndexInGroup + 1) / 90);
+  } else {
+    // Low-discrepancy golden-ratio volumetric fill for 90..20,000+ entries so the entire interior is lush
+    const u = (entryIndexInGroup * 0.618033988749895 + (seed % 199) * 0.005025) % 1;
+    normalizedRadial = 0.12 + 0.88 * Math.sqrt(u);
+  }
+
+  const brainRadius = normalizedRadial * 215 * organicLobe;
+  const rawBrainX = hub.brainHubX + Math.cos(theta) * brainRadius;
+  const rawBrainY = hub.brainHubY + Math.sin(theta) * brainRadius * 1.12;
 
   const clamped = clampToBrainSilhouette(rawBrainX / 520, rawBrainY / 520);
 
-  // Canopy cluster around the group's main branch tip
-  const canopyRadius = Math.min(95, 22 + Math.sqrt(entryIndexInGroup + 1) * 7.5);
-  const treeX = hub.treeBranchX + Math.cos(theta * 1.1) * canopyRadius;
-  const treeY = hub.treeBranchY + Math.sin(theta * 1.1) * canopyRadius * 0.72;
+  // Canopy cluster around the group's main branch tip and sub-branches
+  const subBranchCluster = entryIndexInGroup % 5;
+  const subOffsetAngle = hub.branchAngle + (subBranchCluster - 2) * 0.36;
+  const subOffsetDist = subBranchCluster === 0 ? 0 : 48 + (subBranchCluster % 2) * 28;
+  const clusterCenterX =
+    hub.treeBranchX + (subBranchCluster === 0 ? 0 : Math.cos(subOffsetAngle) * subOffsetDist);
+  const clusterCenterY =
+    hub.treeBranchY + (subBranchCluster === 0 ? 0 : Math.sin(subOffsetAngle) * subOffsetDist * 0.8);
+
+  const canopyRadius = normalizedRadial * 128 * organicLobe;
+  const treeX = clusterCenterX + Math.cos(theta * 1.13) * canopyRadius * 1.15;
+  const treeY = clusterCenterY + Math.sin(theta * 1.13) * canopyRadius * 0.78;
 
   return {
     id: entryId,

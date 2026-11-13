@@ -77,7 +77,7 @@ export const StatsView: React.FC<StatsViewProps> = ({
   }, [entries, groups]);
 
   return (
-    <div className="h-[calc(100vh-4rem)] overflow-y-auto px-4 md:px-8 py-6 pb-24 lg:pb-8 space-y-8">
+    <div className="h-[calc(100dvh-3.5rem)] lg:h-[calc(100dvh-4rem)] overflow-y-auto px-3.5 sm:px-6 md:px-8 py-4 sm:py-6 pb-24 lg:pb-8 space-y-6 sm:space-y-8">
       {/* Top KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="p-6 rounded-2xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-2">

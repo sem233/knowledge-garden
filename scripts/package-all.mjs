@@ -28,18 +28,19 @@ const jsContents = assetFiles
   .map((f) => fs.readFileSync(path.join(assetsDir, f), 'utf8'))
   .join('\n');
 
-// Remove external script/stylesheet asset tags and PWA registration that require http:// origin
+// Remove external script/stylesheet asset tags and PWA registration that require external files
 html = html.replace(/<script[^>]*src="[^"]*\/assets\/[^"]*"[^>]*><\/script>/g, '');
 html = html.replace(/<link[^>]*href="[^"]*\/assets\/[^"]*"[^>]*>/g, '');
 html = html.replace(/<link[^>]*rel="manifest"[^>]*>/g, '');
 html = html.replace(/<script[^>]*src="[^"]*registerSW\.js"[^>]*><\/script>/g, '');
 
-// Escape closing script tags inside JS bundle if any exist
-const safeJs = jsContents.replace(/<\/script>/gi, '<\\/script>');
+// Escape closing script tags inside JS bundle without $-pattern corruption
+const safeJs = jsContents.replace(/<\/script>/gi, () => '<\\/script>');
 
+// IMPORTANT: Use function replacement callbacks so $& and $' inside minified JS are never expanded!
 const standaloneHtml = html
-  .replace('</head>', `<style>\n${cssContents}\n</style>\n</head>`)
-  .replace('</body>', `<script type="module">\n${safeJs}\n</script>\n</body>`);
+  .replace('</head>', () => `<style>\n${cssContents}\n</style>\n</head>`)
+  .replace('</body>', () => `<script type="module">\n${safeJs}\n</script>\n</body>`);
 
 const publicStandalonePath = path.join(publicDir, 'KnowledgeGarden-Standalone.html');
 const distStandalonePath = path.join(distDir, 'KnowledgeGarden-Standalone.html');
@@ -48,7 +49,7 @@ fs.writeFileSync(publicStandalonePath, standaloneHtml, 'utf8');
 fs.writeFileSync(distStandalonePath, standaloneHtml, 'utf8');
 console.log(`Built standalone HTML: ${(standaloneHtml.length / (1024 * 1024)).toFixed(2)} MB`);
 
-// 2. Build Full Project ZIP Archive (GitHub + PC EXE + Android + Standalone HTML) using Python zipfile
+// 2. Build Full Project ZIP Archive using Python zipfile
 const pyScript = `
 import os, zipfile
 
@@ -80,4 +81,3 @@ fs.copyFileSync(
   path.join(publicDir, 'KnowledgeGarden-Full-Project.zip'),
   path.join(distDir, 'KnowledgeGarden-Full-Project.zip')
 );
-

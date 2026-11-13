@@ -532,7 +532,7 @@ export default function App() {
   }
 
   return (
-    <div className="relative min-h-screen w-full flex bg-transparent text-slate-900 dark:text-slate-100">
+    <div className="relative h-[100dvh] w-full flex bg-transparent text-slate-900 dark:text-slate-100 overflow-hidden">
       {/* Living Animated Background */}
       <LivingBackground
         intensity={settings.animationIntensity}
@@ -559,7 +559,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <div className="relative z-10 flex-1 flex flex-col min-w-0 h-[100dvh] overflow-hidden">
         <TopBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}

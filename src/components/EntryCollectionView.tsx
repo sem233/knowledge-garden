@@ -131,28 +131,28 @@ export const EntryCollectionView: React.FC<EntryCollectionViewProps> = ({
   const ringOffset = ringCircumference * (1 - goalRatio);
 
   return (
-    <div ref={parentRef} className="h-[calc(100vh-4rem)] overflow-y-auto px-4 md:px-8 py-6 pb-24 lg:pb-8 space-y-6">
+    <div ref={parentRef} className="h-[calc(100dvh-3.5rem)] lg:h-[calc(100dvh-4rem)] overflow-y-auto px-3.5 sm:px-6 md:px-8 py-4 sm:py-6 pb-24 lg:pb-8 space-y-4 sm:space-y-6">
       {/* Today Hero Banner with Daily Goal Ring */}
       {isTodayView && (
-        <div className="p-6 rounded-3xl bg-gradient-to-l from-violet-950/75 via-indigo-950/60 to-slate-900/80 border border-violet-500/25 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-violet-300">
+        <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-gradient-to-l from-violet-950/75 via-indigo-950/60 to-slate-900/80 border border-violet-500/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 shadow-xl">
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="text-[11px] sm:text-xs font-medium text-violet-300">
               حصاد اليوم المعرفي · {new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </div>
-            <h3 className="font-kufi text-2xl font-bold text-white">
+            <h3 className="font-kufi text-lg sm:text-2xl font-bold text-white leading-snug">
               {todayCount >= dailyGoal
                 ? 'أحسنت! أتممت وردك المعرفي لهذا اليوم 🌟'
                 : 'ماذا تعلمت اليوم لتغذي به شجرة معرفتك؟'}
             </h3>
-            <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+            <p className="text-[11px] sm:text-xs text-slate-300 max-w-xl leading-relaxed">
               كل فائدة أو كلمة أو حكمة تقيّدها اليوم تتحول فوراً إلى خلية عصبية مضيئة في دماغك المعرفي وورقة خضراء في شجرتك.
             </p>
           </div>
 
           {/* Animated Daily Goal SVG Ring */}
-          <div className="flex items-center gap-5 shrink-0 bg-slate-950/50 px-5 py-3.5 rounded-2xl border border-white/10">
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              <svg className="w-20 h-20 -rotate-90" viewBox="0 0 88 88">
+          <div className="w-full md:w-auto flex items-center gap-4 shrink-0 bg-slate-950/50 px-4 py-3 rounded-2xl border border-white/10">
+            <div className="relative w-14 h-14 sm:w-20 sm:h-20 flex items-center justify-center shrink-0">
+              <svg className="w-14 h-14 sm:w-20 sm:h-20 -rotate-90" viewBox="0 0 88 88">
                 <circle
                   cx="44"
                   cy="44"
@@ -175,16 +175,16 @@ export const EntryCollectionView: React.FC<EntryCollectionViewProps> = ({
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-mono text-sm font-bold text-white tabular-nums">
+                <span className="font-mono text-xs sm:text-sm font-bold text-white tabular-nums">
                   {todayCount}/{dailyGoal}
                 </span>
-                <span className="text-[10px] text-slate-400">هدف اليوم</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-400">هدف اليوم</span>
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5 sm:space-y-1">
               <div className="text-xs font-semibold text-white">مؤشر الإنجاز اليومي</div>
-              <div className="text-xs text-slate-400">
+              <div className="text-[11px] sm:text-xs text-slate-400">
                 سجلت اليوم <AnimatedCounter value={todayCount} className="text-emerald-400 font-bold" /> فوائد
               </div>
               <button
@@ -193,7 +193,7 @@ export const EntryCollectionView: React.FC<EntryCollectionViewProps> = ({
                 className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-violet-300 hover:text-white"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>أضف فائدة جديدة (Alt+N)</span>
+                <span>أضف فائدة جديدة</span>
               </button>
             </div>
           </div>

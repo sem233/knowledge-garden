@@ -33,8 +33,9 @@ export class KnowledgeSearchEngine {
     this.miniSearch.removeAll();
     const groupMap = new Map(groups.map((g) => [g.id, g.name]));
 
-    // Index up to 25,000 entries fast
-    const docs: SearchDocument[] = entries.map((e) => ({
+    // Prioritize personal/core entries + first 1,200 entries for instant 0ms search index build
+    const immediateSlice = entries.length > 1500 ? entries.slice(0, 1200) : entries;
+    const docs: SearchDocument[] = immediateSlice.map((e) => ({
       id: e.id,
       title: e.title,
       contentText: e.contentText,
@@ -48,6 +49,23 @@ export class KnowledgeSearchEngine {
     }));
 
     this.miniSearch.addAll(docs);
+
+    // If > 1,500 entries (e.g. 20,000 stress test), index the remainder asynchronously without blocking 120fps UI
+    if (entries.length > 1500) {
+      const restDocs: SearchDocument[] = entries.slice(1200).map((e) => ({
+        id: e.id,
+        title: e.title,
+        contentText: e.contentText,
+        meaning: e.meaning || '',
+        source: e.source || '',
+        tagsText: e.tags.join(' '),
+        groupName: groupMap.get(e.groupId) || '',
+        groupId: e.groupId,
+        type: e.type,
+        date: e.date,
+      }));
+      void this.miniSearch.addAllAsync(restDocs, { chunkSize: 2500 });
+    }
   }
 
   search(query: string): Set<string> {
@@ -59,3 +77,4 @@ export class KnowledgeSearchEngine {
 }
 
 export const searchEngine = new KnowledgeSearchEngine();
+

@@ -12,7 +12,6 @@ import {
   ArrowDown,
   RotateCcw,
   Sparkles,
-  Download,
 } from 'lucide-react';
 import {
   ActiveSection,
@@ -22,7 +21,6 @@ import {
   KnowledgeGroup,
 } from '../types';
 import { GroupIcon, AnimatedCounter } from './GroupIcon';
-import { usePWAInstall } from '../hooks/usePWAInstall';
 
 interface SidebarProps {
   activeSection: ActiveSection;
@@ -76,8 +74,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [draggedGroupId, setDraggedGroupId] = useState<string | null>(null);
   const [formError, setFormError] = useState('');
-
-  const { isInstallable, isInstalled, install } = usePWAInstall();
 
   const openNewGroupModal = () => {
     setEditingGroup(null);
@@ -370,20 +366,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Footer / PWA Install Button */}
-      <div className="p-3 border-t border-slate-200/70 dark:border-slate-800/70 space-y-2">
-        {!isInstalled && isInstallable && (
-          <button
-            type="button"
-            onClick={install}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition-colors whitespace-nowrap"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>تثبيت التطبيق على ويندوز</span>
-          </button>
-        )}
+      {/* Footer */}
+      <div className="p-3 border-t border-slate-200/70 dark:border-slate-800/70">
         <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 px-2">
-          <span>تخزين محلي آمن 100%</span>
+          <span>بستان المعرفة · 120 FPS</span>
           <span className="font-mono">Ctrl+K للبحث</span>
         </div>
       </div>

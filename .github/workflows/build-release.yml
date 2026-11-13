@@ -34,9 +34,9 @@ jobs:
           tag_name: v1.0.0
           name: "بستان المعرفة — تحميل مباشر (Windows .EXE + Android .APK + Chrome .HTML)"
           body: |
-            ## 🌿 تحميل تطبيق بستان المعرفة (Knowledge Garden) لجميع الأجهزة
-            - **للكمبيوتر (Windows .EXE)**: حمّل ملف `KnowledgeGarden-Setup.exe` أو النسخة المحمولة `KnowledgeGarden-Portable.exe` بالأسفل.
-            - **لهاتف الأندرويد (Android .APK)**: حمّل ملف `KnowledgeGarden-Android.apk` وثبّته مباشرة على هاتفك.
+            ## 🌿 تحميل تطبيق بستان المعرفة (Knowledge Garden) لجميع الأجهزة (نسخة 120 FPS المحدثة)
+            - **للكمبيوتر (Windows .EXE)**: حمّل ملف `KnowledgeGarden-PC.exe` بالأسفل وافتحه مباشرة كبرنامج مستقل بدون تثبيت.
+            - **لهاتف الأندرويد (Android .APK)**: حمّل ملف `KnowledgeGarden-Android.apk` وثبّته مباشرة على هاتفك بأبعاد تطبيق أصلية ودعم 120 إطار/ثانية.
             - **كصفحة Google Chrome مستقلة بدون إنترنت (.HTML)**: حمّل ملف `KnowledgeGarden-Standalone.html` وافتحه مباشرة في كروم على الكمبيوتر أو الهاتف.
           files: |
             public/KnowledgeGarden-Standalone.html
@@ -91,6 +91,7 @@ jobs:
         with:
           name: KnowledgeGarden-Android-APK
           path: KnowledgeGarden-Android.apk
+          overwrite: true
 
       - name: Attach Android APK to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -104,9 +105,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Compile Native Windows KnowledgeGarden-PC.exe
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build Fresh Standalone Bundle & Compile Native Windows KnowledgeGarden-PC.exe
         shell: pwsh
         run: |
+          npm install --legacy-peer-deps
+          npm run build
+          node scripts/package-all.mjs
           & "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:winexe /out:KnowledgeGarden-PC.exe /resource:public\KnowledgeGarden-Standalone.html,app.html electron\Launcher.cs
           if (-not (Test-Path "KnowledgeGarden-PC.exe")) { throw "Failed to compile KnowledgeGarden-PC.exe" }
 
@@ -115,11 +124,10 @@ jobs:
         with:
           name: KnowledgeGarden-Windows-EXE
           path: KnowledgeGarden-PC.exe
+          overwrite: true
 
       - name: Attach Windows .EXE to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0
           files: KnowledgeGarden-PC.exe
-
-

@@ -11,11 +11,17 @@
   html {
     font-family: var(--font-cairo);
     direction: rtl;
+    height: 100dvh;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     font-family: var(--font-cairo);
-    overflow-x: hidden;
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
   }
 }
 
